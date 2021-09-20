@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import parkinglotsystem.model.ErrorMessage;
 
 @ControllerAdvice
-public class DataNotFoundExceptionMapper{
+public class GlobalExceptionMapper{
 
 	@ExceptionHandler(DataNotFoundException.class)
 	public ResponseEntity<ErrorMessage> dataNotFound(HttpServletRequest req, Exception e) 
@@ -25,9 +25,16 @@ public class DataNotFoundExceptionMapper{
 	public ResponseEntity<ErrorMessage> dataFound(HttpServletRequest req, Exception e) 
 	{
 	ErrorMessage error = new ErrorMessage(e.getMessage(), 200, req.getRequestURI());
-	return new ResponseEntity<ErrorMessage>(error, HttpStatus.NOT_FOUND);
+	return new ResponseEntity<ErrorMessage>(error, HttpStatus.OK);
 
 	}
 	
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity<ErrorMessage> badRequest(HttpServletRequest req, Exception e) 
+	{
+	ErrorMessage error = new ErrorMessage(e.getMessage(), 400, req.getRequestURI());
+	return new ResponseEntity<ErrorMessage>(error, HttpStatus.BAD_REQUEST);
+
+	}
 	
 }

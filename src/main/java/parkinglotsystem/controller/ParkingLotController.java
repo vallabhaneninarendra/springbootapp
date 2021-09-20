@@ -23,8 +23,10 @@ import org.springframework.web.context.request.WebRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import parkinglotsystem.exception.BadRequestException;
 import parkinglotsystem.exception.DataFoundException;
 import parkinglotsystem.exception.DataNotFoundException;
+import parkinglotsystem.exception.GlobalExceptionMapper;
 import parkinglotsystem.model.Car;
 import parkinglotsystem.model.ErrorMessage;
 import parkinglotsystem.model.Slot;
@@ -41,23 +43,28 @@ public class ParkingLotController {
 	}
 
     @PostMapping("/initiateLot")
-    public ArrayList<Slot> initiateLot(@RequestBody Slot slot){
-    	int slots = slot.getSlotNumber();
-    	if(slots==0) {
-    		  throw new DataNotFoundException("Slot never empty");
-    	}else {
-    		 ArrayList<Slot> availableSlot= service.initiateLot(slot.getSlotNumber());
-    	        return  availableSlot;
-    	}
-       
-    
-       
+    public ArrayList<Slot> initiateLot(@RequestBody Slot slot) throws BadRequestException{
+    	try {
+    		int slots = slot.getSlotNumber();
+        	System.out.println(slots);
+        	if(slots!=0) {
+        		 ArrayList<Slot> availableSlot= service.initiateLot(slot.getSlotNumber());
+     	        return  availableSlot;
+        	}else {
+        		  throw new BadRequestException("Slots can not be empty or null");
+        		
+        	}
+    	}catch (Exception e) {
+    		  throw new BadRequestException("Slots can not be empty or null");
+		}   
     }
+    
     @PostMapping("/ParkTheCar")
-	public ResponseEntity<Object> parkTheCar(@RequestBody Car car)
+	public Token parkTheCar(@RequestBody Car car)
 	{
+    
     	if(car.getCarNumber()!="") {
-    		return new ResponseEntity<>(service.parkTheCar(car.getCarColor(),car.getCarNumber()),HttpStatus.OK);
+    		return service.parkTheCar(car.getCarColor(),car.getCarNumber());
     	}else {
     		  throw new DataNotFoundException("Car number empty");
     	}
@@ -76,18 +83,16 @@ public class ParkingLotController {
             WebRequest request){
         Token token = service.getCarByRegNO(carNumber);
         httpResponse.getStatus();
-        System.out.println(token);
+      
         return token;
     }
     @GetMapping("/getCarByColor/{carColor}")
     public List<Token> getCarByColor(@PathVariable String carColor,HttpServletResponse httpResponse, 
-            WebRequest request) throws JsonProcessingException {
+            WebRequest request) throws DataNotFoundException {
         List<Token> token = service.getCarByColor(carColor);
       
-    httpResponse.setHeader("Location", String.format("%s/getCarByColor/"+carColor+1+"", 
-               request.getContextPath(),request.getParameterMap(),token));
-
-        
+    httpResponse.setHeader("Location", String.format("%s/getCarByColor/"+carColor+"", 
+               request.getContextPath(),token));
         return token;
     }
     @GetMapping("/getAllCars")

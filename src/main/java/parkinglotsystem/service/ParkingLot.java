@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import parkinglotsystem.exception.DataFoundException;
 import parkinglotsystem.exception.DataNotFoundException;
-import parkinglotsystem.exception.DataNotFoundExceptionMapper;
+import parkinglotsystem.exception.GlobalExceptionMapper;
 
 import parkinglotsystem.model.Car;
 import parkinglotsystem.model.Slot;
@@ -21,10 +21,13 @@ public class ParkingLot {
 	   private final List<Token> tokenForLot;
 
 	   private final List<Token> historyOfParking;
+	   
+	   private final List<Token> carList;
 
 	   public ParkingLot() {
 	      this.tokenForLot = new ArrayList<>();
 	      this.historyOfParking = new ArrayList<>();
+	      this.carList = new ArrayList<>();
 	 
 	   }
 
@@ -92,7 +95,7 @@ public class ParkingLot {
 
 		
 		      for(Token tokenSearch:tokenForLot){
-		         String carDetails = ((Token) tokenSearch).getCarDetails().getCarColor();
+		         String carDetails = tokenSearch.getCarDetails().getCarColor();
 		         if(carDetails.equalsIgnoreCase(carColor)){
 		        	 matchColor.add(tokenSearch);
 		         }
